@@ -1,12 +1,9 @@
 
-from ast import Delete
-import imp
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from app.models import Store
 import json
-import requests
 
 class StorListTestCase(APITestCase):
 
