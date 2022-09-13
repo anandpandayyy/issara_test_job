@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework import status
 
 class StoreView(APIView):
    
@@ -16,7 +17,7 @@ class StoreView(APIView):
 
     def get(self, request):
         key = request.GET.get('key')
-        return Response({"response":self.get_queryset(key)},status=200)
+        return Response({"response":self.get_queryset(key)},status=status.HTTP_200_OK)
     
     def post(self,request):
         data = request.data
@@ -25,8 +26,8 @@ class StoreView(APIView):
                 try:
                     Store.objects.create(key=k,value=v)
                 except:
-                    return Response({'errors':f'This key {k} is already exixts'},status=400)        
-            return Response({"response":"data created successfully"},status=201)
+                    return Response({'errors':f'This key {k} is already exixts'},status=status.HTTP_400_BAD_REQUEST)        
+            return Response({"response":"data created successfully"},status=status.HTTP_201_CREATED)
     
     def patch(self,request):
         data = request.data
@@ -39,7 +40,7 @@ class StoreView(APIView):
                         obj.created_at=timezone.now()+timedelta(minutes=5)
                         obj.save()                       
                 except:
-                    return Response({'errors':f'This key {k} does not exixts'},status=400)        
-            return Response({"response":"data update successfully"},status=200)
+                    return Response({'errors':f'This key {k} does not exixts'},status=status.HTTP_404_NOT_FOUND)        
+            return Response({"response":"data update successfully"},status=status.HTTP_205_RESET_CONTENT)
   
         
