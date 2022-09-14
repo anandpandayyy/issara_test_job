@@ -37,8 +37,8 @@ class StoreView(APIView):
                     obj=Store.objects.get(key=k)
                     if obj:
                         obj.value=v
-                        obj.created_at=timezone.now()+timedelta(minutes=5)
-                        obj.save()                       
+                        obj.save()
+                                               
                 except:
                     return Response({'errors':f'This key {k} does not exixts'},status=status.HTTP_404_NOT_FOUND)        
             return Response({"response":"data update successfully"},status=status.HTTP_205_RESET_CONTENT)
