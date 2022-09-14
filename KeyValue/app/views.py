@@ -38,7 +38,6 @@ class StoreView(APIView):
                     if obj:
                         obj.value=v
                         obj.save()
-                                               
                 except:
                     return Response({'errors':f'This key {k} does not exixts'},status=status.HTTP_404_NOT_FOUND)        
             return Response({"response":"data update successfully"},status=status.HTTP_205_RESET_CONTENT)
