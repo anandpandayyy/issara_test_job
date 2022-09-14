@@ -58,3 +58,14 @@ class StorListTestCase(APITestCase):
         response = self.client.patch(url,data, format='json')        
         self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
         self.assertEqual(json.loads(response.content), {"response":"data update successfully"})
+
+    def test_patch_error_store(self):
+        data={'key1':'updatevalues1','key9':'updatevalues2'}
+        url = reverse('values')
+        response = self.client.patch(url,data, format='json')   
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(json.loads(response.content), {"errors":"This key key9 does not exixts"})
+
+    
+    
+        
