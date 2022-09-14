@@ -1,8 +1,10 @@
 import imp
 from django.db import models
-from datetime import datetime,timedelta
+from datetime import timedelta
 from django.utils import timezone
+
 # Create your models here.
+
 class Store(models.Model):
     key = models.CharField(max_length=100,unique=True)
     value = models.CharField(max_length=100)
