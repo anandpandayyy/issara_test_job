@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:latest
+    # restart: always
+    expose:
+      - 3306
+    ports:
+      - 3308:3306
+    environment:
+       MYSQL_DATABASE: 'groot'
+       MYSQL_USER: 'groot'
+       MYSQL_PASSWORD: 'password'
+       MYSQL_ROOT_PASSWORD: 'password'
+    volumes:
+      - database-volume:/var/lib/mysql
+    env_file:
+      - .env
+  migration:
+    build: 
+      context: .
+    command: python manage.py migrate --noinput
+    depends_on:
+      - database
+  web-45:
+    build: 
+      context: .
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8004:8000
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=dbaa1_i7%*3r9-=z-+_mz4r-!qeed@(-a_r(g@k8jo8y3r27%m
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - migration
+      - redis
+      - database
+    env_file:
+      - .env
+
+  redis:
+    image: redis:alpine
+  
+  celery:
+    build:
+      context: .
+    command: celery -A KeyValue worker -l info
+    environment:
+      - DEBUG=1
+      - SECRET_KEY={{SECRET_KEY}}
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis
+  
+  celery-beat:
+    build: 
+      context: .
+    command: celery -A KeyValue beat -l info
+    environment:
+      - DEBUG=1
+      - SECRET_KEY={{SECRET_KEY}}
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis
+
+volumes:
+  database-volume:
