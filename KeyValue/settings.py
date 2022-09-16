@@ -11,22 +11,28 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dotenv
+from django.utils.translation import gettext_lazy as _
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+dotenv_file = os.path.join(os.path.dirname(BASE_DIR), ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ry-tr__9io=@)ubw6tmoy2-qd3!*8h(8ci(-a8q!49t2e1%u5+'
+SECRET_KEY = os.environ.get("SECRET_KEY","django-insecure-ry-tr__9io=@)ubw6tmoy2-qd3!*8h(8ci(-a8q!49t2e1%u5+")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+# DEBUG = os.environ.get("DEBUG",True)
+DEBUG=True
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS","[]")
 
 # Application definition
 
@@ -79,8 +85,15 @@ WSGI_APPLICATION = 'KeyValue.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE':   'mysql.connector.django',
+        'NAME': os.environ.get("DB_NAME","groot"),
+        'USER': os.environ.get("DB_USER","groot"),
+        'PASSWORD': os.environ.get("DB_PASSWORD","password"),
+        'HOST':  os.environ.get("DB_HOST","database"),
+        'PORT': os.environ.get("DB_PORT",3306),
+        'OPTIONS': {
+            'auth_plugin': 'mysql_native_password'
+        }
     }
 }
 
@@ -109,13 +122,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -129,11 +142,12 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL","redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND","redis://redis:6379/0")
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_CACHE_BACKEND = 'default'
 CELERY_ALWAYS_EAGER = True
+

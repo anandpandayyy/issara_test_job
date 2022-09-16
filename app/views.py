@@ -6,8 +6,12 @@ from django.utils import timezone
 from datetime import timedelta
 from rest_framework import status
 
+from django.conf import settings
 class StoreView(APIView):
-   
+    '''
+    api to perform get(list), get by key, post, patch
+    '''
+
     def get_queryset(self,key):
         qs = Store.objects.all()
         if key:
@@ -15,10 +19,12 @@ class StoreView(APIView):
             qs.update(created_at=timezone.now()+timedelta(minutes=5))
         return {i['key']:i['value'] for i in qs.values('key','value')}
 
+    #get list of key or pass parma to get specific key data
     def get(self, request):
         key = request.GET.get('key')
         return Response({"response":self.get_queryset(key)},status=status.HTTP_200_OK)
     
+    #creat store data
     def post(self,request):
         data = request.data
         with transaction.atomic():
@@ -29,6 +35,7 @@ class StoreView(APIView):
                     return Response({'errors':f'This key {k} is already exixts'},status=status.HTTP_400_BAD_REQUEST)        
             return Response({"response":"data created successfully"},status=status.HTTP_201_CREATED)
     
+    #update recorde by key
     def patch(self,request):
         data = request.data
         with transaction.atomic():
@@ -36,7 +43,7 @@ class StoreView(APIView):
                 try:
                     obj=Store.objects.get(key=k)
                     if obj:
-                        obj.value=v
+                        obj.value = v
                         obj.save()
                                                
                 except:
